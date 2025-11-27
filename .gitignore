@@ -19,3 +19,5 @@ DEPLOYMENT-SUCCESS.md
 DEPLOY_INSTRUCTIONS.md
 deployment.json
 discord/
+.vercel
+.env*.local
