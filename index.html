@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MegaClicker - MegaETH Speed Test</title>
+    <style>
+        body {
+            background-color: #0f0f13;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        h1 { margin-bottom: 10px; color: #00ff88; text-shadow: 0 0 10px #00ff88; }
+        .counter-box {
+            background: #1a1a20;
+            padding: 20px 50px;
+            border-radius: 15px;
+            border: 2px solid #333;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+        }
+        #counter {
+            font-size: 80px;
+            font-weight: bold;
+            color: #fff;
+            display: block;
+        }
+        .label { font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+        
+        #click-btn {
+            background: linear-gradient(45deg, #00ff88, #00b8ff);
+            border: none;
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+            text-transform: uppercase;
+        }
+        #click-btn:active { transform: scale(0.95); box-shadow: 0 0 10px rgba(0, 255, 136, 0.6); }
+        #click-btn:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
+
+        #wallet-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        #wallet-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        
+        .log-area {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+            height: 100px;
+            overflow-y: auto;
+            width: 300px;
+            text-align: center;
+        }
+        .ping { color: #00ff88; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+<body>
+
+    <button id="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
+
+    <h1>MEGA CLICKER</h1>
+    
+    <div class="counter-box">
+        <span class="label">Global Clicks</span>
+        <span id="counter">0</span>
+    </div>
+
+    <button id="click-btn" onclick="clickerAction()">CLICK TO PUMP</button>
+
+    <div class="log-area" id="logs">
+        Waiting for connection...<br>
+        Ready to test MegaETH latency.
+    </div>
+
+    <script>
+        // CONFIGURATION (ใส่ค่าสมมติไปก่อนเพื่อให้เว็บทำงานได้)
+        const MEGA_CHAIN_ID = '0x18CA'; // 6342 in hex
+        const CONTRACT_ADDRESS = "0xYOUR_CONTRACT_ADDRESS_HERE"; // จะใส่ทีหลังเมื่อ deploy
+        let provider, signer, contract;
+        let count = 0;
+
+        // ABI คร่าวๆ สำหรับเรียกใช้ Smart Contract
+        const abi = [
+            "function click() public",
+            "function globalCount() public view returns (uint256)",
+            "event Clicked(address indexed user, uint256 newCount)"
+        ];
+
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    const address = await signer.getAddress();
+                    
+                    document.getElementById("wallet-btn").innerText = address.substring(0,6) + "..." + address.substring(38);
+                    addLog("Wallet Connected: " + address);
+                    
+                    // เช็ค Network (ถ้าไม่ใช่ MegaETH ให้แจ้งเตือน แต่ยังให้เล่นได้แบบ Demo)
+                    const network = await provider.getNetwork();
+                    if(network.chainId !== 6342) {
+                        addLog("⚠️ Note: Switch to MegaETH Testnet for real transaction.");
+                    }
+
+                } catch (error) {
+                    addLog("Error: " + error.message);
+                }
+            } else {
+                alert("Please install MetaMask!");
+            }
+        }
+
+        async function clickerAction() {
+            // DEMO MODE: เนื่องจากยังไม่ได้ Deploy จริง ให้ตัวเลขเด้งหลอกๆ ไปก่อนเพื่อถ่ายรูป
+            const btn = document.getElementById("click-btn");
+            
+            // Effect กดปุ่ม
+            count++;
+            document.getElementById("counter").innerText = count;
+            
+            // Random Latency แบบหลอกๆ เพื่อโชว์ความเร็ว (Simulation)
+            const latency = Math.floor(Math.random() * 50) + 10; // 10-60ms
+            addLog(`<span class='ping'>Transaction sent! (Simulated Latency: ${latency}ms)</span>`);
+            
+            // ถ้าเชื่อมต่อจริง จะใช้โค้ดนี้:
+            // if (contract) { await contract.click(); }
+        }
+
+        function addLog(msg) {
+            const logBox = document.getElementById("logs");
+            logBox.innerHTML = msg + "<br>" + logBox.innerHTML;
+        }
+    </script>
+</body>
+</html>

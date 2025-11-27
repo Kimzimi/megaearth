@@ -1,0 +1,118 @@
+BMAD v.6: MegaClicker - Real-time Latency Benchmark
+Document Version: 6.0 (Final Draft) Date: November 26, 2025 Target Network: MegaETH Testnet Project Type: High-Frequency Gaming / Technical Demo
+
+1. Executive Summary (บทสรุปผู้บริหาร)
+MegaClicker ไม่ใช่เพียงแค่เกม แต่คือ "Interactive Latency Benchmark Tool" (เครื่องมือทดสอบความหน่วงแบบตอบโต้ได้) ที่สร้างขึ้นบนเครือข่าย MegaETH
+
+เป้าหมายหลักของโปรเจกต์นี้คือการพิสูจน์ศักยภาพของ MegaETH ในฐานะ "Real-time Blockchain" โดยการสร้าง dApp ที่ต้องการการอัปเดตสถานะ (State Updates) ในระดับ Millisecond ผ่านกลไกการแข่งกันกดปุ่ม (Global Counter) ของผู้ใช้งานทั่วโลก ซึ่งเป็นสิ่งที่ Blockchain ยุคเก่า (Legacy Chains) ไม่สามารถทำได้โดยไร้ความหน่วง
+
+2. Problem & Solution (ปัญหาและทางออก)
+2.1 The Problem: The "Lag" of Legacy Chains
+ใน Blockchain ทั่วไป (เช่น Ethereum Mainnet หรือ L2 บางตัว) การสร้างเกมที่ต้องมีการโต้ตอบทันที (Real-time Interaction) เป็นเรื่องยากเนื่องจาก:
+
+Block Time สูง: ต้องรอ 2-12 วินาทีกว่า Transaction จะยืนยัน
+
+Poor UX: ผู้ใช้ต้องรอนาน ทำให้ประสบการณ์ไม่ต่างจากเว็บยุค 90
+
+Reference: Ethereum Block Time Statistics
+
+2.2 The Solution: MegaClicker on MegaETH
+MegaClicker ใช้ประโยชน์จากสถาปัตยกรรมของ MegaETH เพื่อมอบประสบการณ์ "Web2 Experience with Web3 Security":
+
+Instant Feedback: เมื่อผู้เล่นกด Click ธุรกรรมจะถูกยืนยันและอัปเดตตัวเลข Global Count แทบจะทันที
+
+High Throughput: รองรับการกดรัวๆ จากผู้เล่นหลายพันคนพร้อมกันโดยระบบไม่ล่ม
+
+Reference: MegaETH Architecture Overview
+
+3. Business Model & Strategic Value (โมเดลธุรกิจและคุณค่า)
+แม้จะเป็น Free-to-play dApp แต่โมเดลนี้สร้างมูลค่ามหาศาลให้กับ Ecosystem:
+
+3.1 Value Proposition for MegaETH Network
+Stress Testing: ทำหน้าที่เป็นเครื่องมือ Stress Test เครือข่ายด้วย Transaction ปริมาณมาก (High Volume Tx)
+
+Developer Showcase: เป็น Open-source ตัวอย่างให้ Developer คนอื่นเห็นวิธีเขียน dApp ที่เร็วระดับ Real-time
+
+Onboarding Funnel: เกมที่เล่นง่าย (Low Barrier to Entry) ช่วยดึงดูด User หน้าใหม่ให้ลองใช้ Wallet และขอ Faucet บน MegaETH
+
+3.2 User Incentives (Gamification)
+Leaderboard Dominance: แข่งขันเพื่อชิงความเป็นที่ 1 ในการกด (Status Signaling)
+
+Future Airdrop Criteria: การมีส่วนร่วมกับ Contract (Tx count) อาจถูกนำไปใช้คำนวณคะแนนสำหรับกิจกรรมในอนาคต
+
+4. Architectural Design (สถาปัตยกรรมระบบแบบละเอียด)
+เราออกแบบระบบโดยเน้นความเบา (Lightweight) และความเร็ว (Speed) เป็นหลัก
+
+4.1 Technology Stack
+Blockchain: MegaETH Testnet (EVM Compatible, Chain ID: 6342)
+
+Smart Contract: Solidity v0.8.x (Optimized for gas)
+
+Frontend Framework: React + Vite (Fast HMR)
+
+Web3 Library: Ethers.js v5 / Viem (Lightweight connection)
+
+RPC Endpoint: https://carrot.megaeth.com/rpc (Official Node)
+
+4.2 System Workflow (Diagram)
+Code snippet
+
+graph TD
+    User[User / Player] -->|1. Click Action| Frontend[React Frontend]
+    Frontend -->|2. Sign Tx (MetaMask)| Wallet[Web3 Wallet]
+    Wallet -->|3. Send Raw Tx| RPC[MegaETH Sequencer]
+    RPC -->|4. Update State| Contract[MegaClicker.sol]
+    Contract -->|5. Emit Event 'Clicked'| EventLoop[Event Stream]
+    EventLoop -->|6. Push Update (<100ms)| Frontend
+    Frontend -->|7. Update UI| User
+4.3 Technical Implementation Details
+Event-Driven Updates: แทนที่จะใช้การ Poll ข้อมูลทุกวินาที เราใช้การ Listen Events จาก Blockchain โดยตรง ซึ่ง MegaETH รองรับการส่ง Event ที่รวดเร็วมาก
+
+Optimistic UI: หน้าเว็บจะตอบสนองทันทีที่กด (Visual Feedback) และยืนยันผลเมื่อ Event กลับมา เพื่อความลื่นไหลสูงสุด
+
+Documentation Reference: Building on MegaETH
+
+5. Development Roadmap (แผนการพัฒนา)
+Phase 1: The MVP (Current Status: ✅ Ready for Deployment)
+[x] Smart Contract Development (Basic Counter Logic)
+
+[x] Frontend Interface (Connect Wallet + Click Button)
+
+[x] Local Environment Testing (Hardhat)
+
+[ ] Next Step: Deploy to MegaETH Testnet once whitelisted.
+
+Phase 2: Competitive Features (Q2 2025)
+Leaderboard System: เก็บข้อมูล msg.sender ว่าใครกดเยอะที่สุดและแสดงผล Real-time
+
+Team Battle: แบ่งสีทีม (Red vs Blue) แข่งกันดันกราฟ
+
+Sound FX Integration: เพิ่มเสียงเมื่อมีการ Click เพื่อความสนุก
+
+Phase 3: The "Mega" Scale (Post-Mainnet)
+Integration with MegaETH Realtime API for sub-millisecond synchronization.
+
+NFT Rewards for Top Clickers (Soulbound Tokens).
+
+6. References & Resource Links (แหล่งข้อมูลอ้างอิง)
+ข้อมูลเหล่านี้ถูกใช้เพื่ออ้างอิงในการออกแบบสถาปัตยกรรมของ MegaClicker:
+
+MegaETH Official Docs: ข้อมูลหลักเกี่ยวกับโครงสร้าง Network
+
+URL: https://docs.megaeth.com/
+
+MegaETH Realtime API: ศึกษาเรื่องการส่งข้อมูลความเร็วสูง
+
+URL: https://docs.megaeth.com/realtime-api
+
+Layr-Labs MEGAPhone: แรงบันดาลใจในการทำ Real-time Demo
+
+URL: https://github.com/Layr-Labs/MEGAPhone
+
+EVM Documentation: มาตรฐาน Solidity ที่ใช้พัฒนา
+
+URL: https://ethereum.org/en/developers/docs/
+
+React & Ethers.js: เครื่องมือพัฒนา Frontend
+
+URL: https://docs.ethers.org/v5/

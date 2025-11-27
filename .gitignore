@@ -1,0 +1,24 @@
+node_modules/
+.env
+.env.local
+cache/
+artifacts/
+coverage/
+typechain/
+typechain-types/
+*.log
+.DS_Store
+
+# Sensitive files - DO NOT COMMIT
+hardhat.config.js
+scripts/deploy-fixed.js
+scripts/deploy-nuclear.js
+scripts/deploy-grok.js
+scripts/deploy.js
+DEPLOYMENT-SUCCESS.md
+DEPLOY_INSTRUCTIONS.md
+deployment.json
+discord/
+
+# Documentation files with sensitive info
+README.md

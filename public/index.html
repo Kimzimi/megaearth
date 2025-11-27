@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MegaClicker - Real-time Blockchain Benchmark</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #333;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ff88, #00b8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #00ff88, #00b8ff);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        #wallet-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #00ff88;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        #wallet-btn:hover {
+            background: rgba(0, 255, 136, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Main Content */
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            gap: 40px;
+        }
+
+        .title {
+            text-align: center;
+        }
+
+        .title h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .stat-card {
+            background: rgba(26, 26, 32, 0.8);
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: #00ff88;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 42px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ff88, #00b8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Click Button */
+        .click-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        #click-btn {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00ff88, #00b8ff);
+            border: none;
+            font-size: 28px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #click-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px rgba(0, 255, 136, 0.7);
+        }
+
+        #click-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        #click-btn:disabled {
+            background: linear-gradient(135deg, #333, #555);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .click-btn-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Ripple Effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Logs */
+        .log-area {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            height: 150px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-left: 3px solid #00ff88;
+            padding-left: 10px;
+        }
+
+        .log-entry.success {
+            border-left-color: #00ff88;
+            color: #00ff88;
+        }
+
+        .log-entry.error {
+            border-left-color: #ff0055;
+            color: #ff0055;
+        }
+
+        .log-entry.info {
+            border-left-color: #00b8ff;
+            color: #00b8ff;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid #333;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: #00ff88;
+            text-decoration: none;
+        }
+
+        /* Leaderboard */
+        .leaderboard {
+            background: rgba(26, 26, 32, 0.8);
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 25px;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+
+        .leaderboard h3 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #00ff88;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid #333;
+            align-items: center;
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .rank {
+            font-weight: bold;
+            color: #00ff88;
+            width: 40px;
+        }
+
+        .address {
+            flex: 1;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .clicks {
+            font-weight: bold;
+            color: #00b8ff;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00ff88;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00b8ff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">M</div>
+            <div class="logo-text">MEGAETH</div>
+        </div>
+        <button id="wallet-btn" onclick="connectWallet()">เชื่อมต่อ Wallet</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="title">
+            <h1>MEGA CLICKER</h1>
+            <p class="subtitle">Real-time Blockchain Benchmark</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Global Clicks</div>
+                <div class="stat-value" id="global-count">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Your Clicks</div>
+                <div class="stat-value" id="user-count">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Players</div>
+                <div class="stat-value" id="player-count">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Latency</div>
+                <div class="stat-value" id="latency">--</div>
+            </div>
+        </div>
+
+        <!-- Click Button -->
+        <div class="click-area">
+            <button id="click-btn" onclick="handleClick()">
+                <span class="click-btn-text">CLICK TO PUMP</span>
+            </button>
+        </div>
+
+        <!-- Logs -->
+        <div class="log-area" id="logs">
+            <div class="log-entry info">🚀 ระบบพร้อมใช้งาน - รอการเชื่อมต่อ Wallet</div>
+            <div class="log-entry info">💡 เชื่อมต่อ Wallet เพื่อเริ่มทดสอบความเร็วของ MegaETH</div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard">
+            <h3>🏆 TOP CLICKERS</h3>
+            <div id="leaderboard-list">
+                <div class="leaderboard-item">
+                    <span class="rank">#1</span>
+                    <span class="address">0x0000...0000</span>
+                    <span class="clicks">0 clicks</span>
+                </div>
+                <div class="leaderboard-item">
+                    <span class="rank">#2</span>
+                    <span class="address">0x0000...0000</span>
+                    <span class="clicks">0 clicks</span>
+                </div>
+                <div class="leaderboard-item">
+                    <span class="rank">#3</span>
+                    <span class="address">0x0000...0000</span>
+                    <span class="clicks">0 clicks</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Built on <a href="https://megaeth.com" target="_blank">MegaETH</a> |
+        <a href="https://github.com" target="_blank">GitHub</a> |
+        Real-time Blockchain Benchmark Tool</p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
