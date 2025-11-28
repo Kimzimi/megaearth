@@ -17,9 +17,20 @@ A blockchain-powered global clicking battle game built on MegaETH Testnet.
 - **Frontend**: Vanilla JavaScript + Ethers.js v5.7.2
 - **Deployment**: Vercel
 
-## Contract Address
+## Contract Details
 
-`0xAcE11cd4190C558524d409FBd16e7D8d650FD983` on MegaETH Timothy Testnet v2
+**Contract Address:** `0xAcE11cd4190C558524d409FBd16e7D8d650FD983`
+
+**Network Configuration:**
+- Chain ID: 6343 (0x18C7)
+- RPC URL: `https://timothy.megaeth.com/rpc`
+- Explorer: https://megaeth-testnet-v2.blockscout.com/
+
+**Deployment Info:**
+- Deployed using: Foundry Cast
+- Gas Limit: 30,000,000 (Timothy Testnet requires high gas)
+- Gas Price: 1 gwei
+- Transaction: `0x5bb859285d6fb7e0e1de6daa45c3f78c234d37b586652fc5710c1bd6d93e4a0b`
 
 ## How to Play
 
